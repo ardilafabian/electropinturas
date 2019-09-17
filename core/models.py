@@ -20,10 +20,12 @@ class Item(models.Model):
     code = models.CharField(max_length=20, default='0000')
     title = models.CharField(max_length=100)
     price = models.FloatField()
+    discount_price = models.FloatField(blank=True, null=True)
     #TO-DO: Erase the nullable feature at the end
     category = models.ForeignKey(CategoryChoices, on_delete=models.CASCADE, null=True)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
+    description = models.TextField()
 
     def __str__(self):
         return self.title
