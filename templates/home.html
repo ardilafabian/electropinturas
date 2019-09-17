@@ -70,7 +70,7 @@
 
               <div class="card-body text-center">
                 <a href="" class="grey-text">
-                  <h5> item.get_category_display </h5>
+                  <h5> {{ item.category }} </h5>
                 </a>
                 <h5>
                   <strong>
@@ -85,9 +85,9 @@
                     <!--
                   {% if item.discount_price %}
                   {{ item.discount_price }}
-                  {% else %}
+                  {% else %}-->
                   {{ item.price }}
-                  {% endif %}-->
+                  <!--{% endif %}-->
                   </strong>
                 </h4>
 
