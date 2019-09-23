@@ -11,20 +11,17 @@ def products(request):
     }
     return render(request, "products.html", context)
 
-
 def checkout(request):
     return render(request, "checkout.html")
 
-
 class HomeView(ListView):
     model = Item
+    paginate_by = 10
     template_name = "home.html"
-
 
 class ItemDetailView(DetailView):
     model = Item
     template_name = "product.html"
-
 
 def add_to_cart(request, slug):
      item = get_object_or_404(Item, slug=slug)
