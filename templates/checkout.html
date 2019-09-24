@@ -20,8 +20,8 @@
                 <div class="card">
 
                     <!--Card content-->
-                    <form class="card-body">
-
+                    <form method="POST" class="card-body">
+                        {% csrf_token %}
                         <!--address-->
                         <div class="md-form mb-5">
                             {% comment %}<input type="text" id="address" class="form-control" placeholder="1234 Main St">{% endcomment %}
@@ -89,7 +89,7 @@
                         <div class="d-block my-3">
                             {% for value, name in form.fields.payment_option.choices %}
                             <div class="custom-control custom-radio">
-                                <input id="{{ name }}" name="paymentMethod" type="radio" class="custom-control-input" required>
+                                <input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="custom-control-input" required>
                                 <label class="custom-control-label" for="{{ name }}">{{ name }}</label>
                             </div>
                             {% endfor %}

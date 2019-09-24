@@ -25,10 +25,14 @@ class CheckoutView(View):
         return render(self.request, "checkout.html", context)
 
     def post(self, *args, **kwargs):
-        form = CheckoutForm(self.request.FORM or None)
+        form = CheckoutForm(self.request.POST or None)
+        #print(self.request.POST)
         if form.is_valid():
-            print("The form is valid.")
+            #print(form.cleaned_data)
+            #print("The form is valid.")
             return redirect("core:checkout")
+        messages.warning(self.request, "Fallo en la revisión.")
+        return redirect("core:checkout")
 
 class HomeView(ListView):
     model = Item
