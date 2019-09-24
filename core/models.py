@@ -9,7 +9,12 @@ LABEL_CHOICES = (
     ('D', 'danger')
 )
 
-class CategoryChoices(models.Model):
+ADDRESS_CHOICES = (
+    ('B', 'Billing'),
+    ('S', 'Shipping'),
+)
+
+class CategoryChoice(models.Model):
     title = models.CharField(max_length=100)
     code = models.CharField(max_length=20)
     description = models.CharField(max_length=500)
@@ -23,7 +28,7 @@ class Item(models.Model):
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
     #TO-DO: Erase the nullable feature at the end
-    category = models.ForeignKey(CategoryChoices, on_delete=models.CASCADE, null=True)
+    category = models.ForeignKey(CategoryChoice, on_delete=models.CASCADE, null=True)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
@@ -81,7 +86,8 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
-    billing_address = models.ForeignKey('BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
+    billing_address = models.ForeignKey('Address', related_name="billing_address", on_delete=models.SET_NULL, blank=True, null=True)
+    shipping_address = models.ForeignKey('Address', related_name="shipping_address", on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
     being_delivered = models.BooleanField(default=False)
     received = models.BooleanField(default=False)
@@ -99,13 +105,15 @@ class Order(models.Model):
             total -= self.coupon.amount
         return total
 
-class BillingAddress(models.Model):
+class Address(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE)
     street_address = models.CharField(max_length=100)
     apartment_address = models.CharField(max_length=100)
     country = CountryField()
     zip = models.CharField(max_length=100)
+    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
+    default = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username

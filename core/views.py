@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from .forms import CheckoutForm, CouponForm, RefundForm
-from .models import Item, OrderItem, Order, BillingAddress, Coupon, Refund
+from .models import Item, OrderItem, Order, Address, Coupon, Refund
 
 import random
 import string
@@ -52,12 +52,13 @@ class CheckoutView(View):
                 #save_info = form.cleaned_data.get('save_info')
                 payment_option = form.cleaned_data.get('payment_option')
 
-                billing_address = BillingAddress(
+                billing_address = Address(
                     user=self.request.user,
                     street_address=street_address,
                     apartment_address=apartment_address,
                     country=country,
                     zip=zip,
+                    address_type = 'B'
                 )
 
                 billing_address.save()
