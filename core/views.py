@@ -19,8 +19,10 @@ class CheckoutView(View):
     def get(self, *args, **kwargs):
         # Form
         form = CheckoutForm()
+        order = Order.objects.get(user=self.request.user, ordered=False)
         context = {
-            'form':form
+            'form':form,
+            'order':order
         }
         return render(self.request, "checkout.html", context)
 
@@ -53,13 +55,22 @@ class CheckoutView(View):
                 billing_address.save()
                 order.billing_address = billing_address
                 order.save()
+
                 # TODO: Add redirect to delected payment option
-                return redirect("core:checkout")
-            messages.warning(self.request, "Fallo en la revisión.")
-            return redirect("core:checkout")
+                if payment_option == 'S':
+                    return redirect("core:payment", payment_option='stripe')
+                elif payment_option == 'P':
+                    return redirect("core:payment", payment_option='paypal')
+                else:
+                    messages.warning(self.request, "Invalid payment option selected.")
+                    return redirect("core:checkout")
         except ObjectDoesNotExist:
             messages.error(self.request, "Tu no tienes una orden activa.")
             return redirect("core:order-summary")
+
+class PaymentView(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, "payment.html")
 
 class HomeView(ListView):
     model = Item
