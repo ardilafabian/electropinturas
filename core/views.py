@@ -86,7 +86,7 @@ def remove_from_cart(request, slug):
              )[0]
              order.items.remove(order_item)
              messages.info(request, "Este producto fue eliminado de tu pedido.")
-             return redirect("core:product", slug=slug)
+             return redirect("core:order-summary")
          else:
              messages.info(request, "Este producto no se encuentra en tu pedido.")
              return redirect("core:product", slug=slug)
@@ -110,8 +110,11 @@ def remove_single_item_from_cart(request, slug):
                 user=request.user,
                 ordered=False
              )[0]
-             order_item.quantity -= 1
-             order_item.save()
+             if order_item.quantity > 1:
+                 order_item.quantity -= 1
+                 order_item.save()
+             else:
+                 order.items.remove(order_item)
              messages.info(request, "La cantidad de este producto fue actualizada.")
              return redirect("core:order-summary")
          else:
