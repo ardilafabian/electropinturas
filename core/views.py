@@ -32,6 +32,25 @@ class CheckoutView(View):
             'order':order,
             'DISPLAY_COUPON_FORM':True
         }
+
+        shipping_address_qs = Address.objects.filter(
+            user=self.request.user,
+            address_type='S',
+            default=True
+        )
+
+        if shipping_address_qs.exists():
+            context.update({ 'default_shipping_address':shipping_address_qs[0] })
+
+        billing_address_qs = Address.objects.filter(
+            user=self.request.user,
+            address_type='B',
+            default=True
+        )
+
+        if billing_address_qs.exists():
+            context.update({ 'default_billing_address':billing_address_qs[0] })
+
         return render(self.request, "checkout.html", context)
 
     def post(self, *args, **kwargs):
@@ -47,9 +66,7 @@ class CheckoutView(View):
                 apartment_address = form.cleaned_data.get('apartment_address')
                 country = form.cleaned_data.get('country')
                 zip = form.cleaned_data.get('zip')
-                # TODO: Add functionality for these fields
-                #same_shipping_address = form.cleaned_data.get('same_shipping_address')
-                #save_info = form.cleaned_data.get('save_info')
+
                 payment_option = form.cleaned_data.get('payment_option')
 
                 billing_address = Address(
@@ -74,7 +91,7 @@ class CheckoutView(View):
                     messages.warning(self.request, "Invalid payment option selected.")
                     return redirect("core:checkout")
         except ObjectDoesNotExist:
-            messages.error(self.request, "Tu no tienes una orden activa.")
+            messages.info(self.request, "Tu no tienes una orden activa.")
             return redirect("core:order-summary")
 
 class PaymentView(View):
@@ -95,7 +112,7 @@ class OrderSummaryView(LoginRequiredMixin, View):
             }
             return render(self.request, "order_summary.html", context)
         except ObjectDoesNotExist:
-            messages.error(self.request, "Tu no tienes una orden activa.")
+            messages.info(self.request, "Tu no tienes una orden activa.")
             return redirect("/")
 
 class ItemDetailView(DetailView):

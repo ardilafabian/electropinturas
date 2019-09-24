@@ -118,6 +118,9 @@ class Address(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        verbose_name_plural = 'Addresses'
+
 class Coupon(models.Model):
     code = models.CharField(max_length=15)
     amount = models.FloatField()
