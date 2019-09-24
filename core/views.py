@@ -5,9 +5,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
-from .forms import CheckoutForm, CouponForm
-from .models import Item, OrderItem, Order, BillingAddress, Coupon
+from .forms import CheckoutForm, CouponForm, RefundForm
+from .models import Item, OrderItem, Order, BillingAddress, Coupon, Refund
 
+import random
+import string
+
+
+def create_ref_code():
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
 
 def products(request):
     context = {
@@ -206,3 +212,29 @@ class AddCouponView(View):
             except ObjectDoesNotExist as e:
                 messages.info(self.request, "Tu no tienes una orden activa.")
                 return redirect("core:checkout")
+
+class RequestRefundView(View):
+    def post(self, *args, **kwargs):
+        form = RefundForm(self.request.POST)
+        if form.is_valid():
+            ref_code = form.cleaned_data.get('ref_code')
+            message = form.cleaned_data.get('message')
+            email = form.cleaned_data.get('email')
+            try:
+                # Edit ordered
+                order = Order.objects.get(ref_code=ref_code)
+                order.refund_requested = True
+                order.save()
+
+                # Store the refund
+                refund = Refund()
+                refund.order = order
+                refund.reason = message
+                refund.email = email
+                refund.save()
+
+                messages.info(self.request, "Tu solicitud fue recivida.")
+                return redirect("core:request-refund")
+            except ObjectDoesNotExist as e:
+                messages.info(self.request, "Esta orden no existe.")
+                return redirect("core:request-refund")
