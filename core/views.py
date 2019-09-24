@@ -214,6 +214,13 @@ class AddCouponView(View):
                 return redirect("core:checkout")
 
 class RequestRefundView(View):
+    def get(self, *args, **kwargs):
+        form = RefundForm()
+        context = {
+            'form':form
+        }
+        return render(self.request, "request_refund.html", context)
+
     def post(self, *args, **kwargs):
         form = RefundForm(self.request.POST)
         if form.is_valid():
