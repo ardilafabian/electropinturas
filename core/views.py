@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
+from .forms import CheckoutForm
 from .models import Item, OrderItem, Order
 
 
@@ -14,8 +15,20 @@ def products(request):
     }
     return render(request, "products.html", context)
 
-def checkout(request):
-    return render(request, "checkout.html")
+class CheckoutView(View):
+    def get(self, *args, **kwargs):
+        # Form
+        form = CheckoutForm()
+        context = {
+            'form':form
+        }
+        return render(self.request, "checkout.html", context)
+
+    def post(self, *args, **kwargs):
+        form = CheckoutForm(self.request.FORM or None)
+        if form.is_valid():
+            print("The form is valid.")
+            return redirect("core:checkout")
 
 class HomeView(ListView):
     model = Item
