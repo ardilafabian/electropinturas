@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
-from .forms import CheckoutForm
+from .forms import CheckoutForm, CouponForm
 from .models import Item, OrderItem, Order, BillingAddress, Coupon
 
 
@@ -22,6 +22,7 @@ class CheckoutView(View):
         order = Order.objects.get(user=self.request.user, ordered=False)
         context = {
             'form':form,
+            'couponform':CouponForm(),
             'order':order
         }
         return render(self.request, "checkout.html", context)
@@ -188,14 +189,21 @@ def get_coupon(request, code):
         return redirect("core:checkout")
 
 def add_coupon(request):
-    try:
-        order = Order.objects.get(user=request.user, ordered=False)
-        order.coupon = get_coupon(request, code)
+    if request.method == "POST":
+        form = CouponForm(request.POST or None)
+        if form.is_valid():
+            try:
+                code = form.cleaned_data.get('code')
 
-        order.save()
+                order = Order.objects.get(user=request.user, ordered=False)
+                order.coupon = get_coupon(request, code)
 
-        messages.success(request, "Cupón agregado exitósamente")
-        return redirect("core:checkout")
-    except ObjectDoesNotExist as e:
-        messages.info(request, "Tu no tienes una orden activa.")
-        return redirect("core:checkout")
+                order.save()
+
+                messages.success(request, "Cupón agregado exitósamente")
+                return redirect("core:checkout")
+            except ObjectDoesNotExist as e:
+                messages.info(request, "Tu no tienes una orden activa.")
+                return redirect("core:checkout")
+    # TODO: Raise error
+    return None
