@@ -56,7 +56,7 @@ class CheckoutView(View):
                 order.billing_address = billing_address
                 order.save()
 
-                # TODO: Add redirect to delected payment option
+                # TODO: Add redirect to cash payment
                 if payment_option == 'S':
                     return redirect("core:payment", payment_option='stripe')
                 elif payment_option == 'P':
