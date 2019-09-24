@@ -23,7 +23,8 @@ class CheckoutView(View):
         context = {
             'form':form,
             'couponform':CouponForm(),
-            'order':order
+            'order':order,
+            'DISPLAY_COUPON_FORM':True
         }
         return render(self.request, "checkout.html", context)
 
@@ -188,22 +189,20 @@ def get_coupon(request, code):
         messages.info(request, "Este cupón no existe.")
         return redirect("core:checkout")
 
-def add_coupon(request):
-    if request.method == "POST":
-        form = CouponForm(request.POST or None)
+class AddCouponView(View):
+    def post(self, *args, **kwargs):
+        form = CouponForm(self.request.POST or None)
         if form.is_valid():
             try:
                 code = form.cleaned_data.get('code')
 
-                order = Order.objects.get(user=request.user, ordered=False)
-                order.coupon = get_coupon(request, code)
+                order = Order.objects.get(user=self.request.user, ordered=False)
+                order.coupon = get_coupon(self.request, code)
 
                 order.save()
 
-                messages.success(request, "Cupón agregado exitósamente")
+                messages.success(self.request, "Cupón agregado exitósamente")
                 return redirect("core:checkout")
             except ObjectDoesNotExist as e:
-                messages.info(request, "Tu no tienes una orden activa.")
+                messages.info(self.request, "Tu no tienes una orden activa.")
                 return redirect("core:checkout")
-    # TODO: Raise error
-    return None
