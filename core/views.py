@@ -54,11 +54,11 @@ def add_to_cart(request, slug):
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "La cantidad de este producto fue actualizada.")
-            return redirect("core:product", slug=slug)
+            return redirect("core:order-summary")
          else:
             messages.info(request, "Este producto fue añadido a tu pedido.")
             order.items.add(order_item)
-            return redirect("core:product", slug=slug)
+            return redirect("core:order-summary")
      else:
         ordered_date = timezone.now()
         order = Order.objects.create(
@@ -66,7 +66,7 @@ def add_to_cart(request, slug):
             ordered_date=ordered_date)
         order.items.add(order_item)
         messages.info(request, "Este producto fue añadido a tu pedido.")
-     return redirect("core:product", slug=slug)
+     return redirect("core:order-summary")
 
 @login_required
 def remove_from_cart(request, slug):
@@ -87,6 +87,33 @@ def remove_from_cart(request, slug):
              order.items.remove(order_item)
              messages.info(request, "Este producto fue eliminado de tu pedido.")
              return redirect("core:product", slug=slug)
+         else:
+             messages.info(request, "Este producto no se encuentra en tu pedido.")
+             return redirect("core:product", slug=slug)
+     else:
+         messages.info(request, "Tu no tienes una orden activa.")
+         return redirect("core:product", slug=slug)
+
+@login_required
+def remove_single_item_from_cart(request, slug):
+     item = get_object_or_404(Item, slug=slug)
+     order_qs = Order.objects.filter(
+         user=request.user,
+         ordered=False,
+     )
+     if order_qs.exists():
+         order = order_qs[0]
+         # Check if the order item is in the order
+         if order.items.filter(item__slug=item.slug).exists():
+             order_item = OrderItem.objects.filter(
+                item=item,
+                user=request.user,
+                ordered=False
+             )[0]
+             order_item.quantity -= 1
+             order_item.save()
+             messages.info(request, "La cantidad de este producto fue actualizada.")
+             return redirect("core:order-summary")
          else:
              messages.info(request, "Este producto no se encuentra en tu pedido.")
              return redirect("core:product", slug=slug)
