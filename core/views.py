@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from .forms import CheckoutForm
-from .models import Item, OrderItem, Order, BillingAddress
+from .models import Item, OrderItem, Order, BillingAddress, Coupon
 
 
 def products(request):
@@ -178,3 +178,24 @@ def remove_single_item_from_cart(request, slug):
      else:
          messages.info(request, "Tu no tienes una orden activa.")
          return redirect("core:product", slug=slug)
+
+def get_coupon(request, code):
+    try:
+        coupon = Coupon.objects.get(code=code)
+        return coupon
+    except ObjectDoesNotExist as e:
+        messages.info(request, "Este cupón no existe.")
+        return redirect("core:checkout")
+
+def add_coupon(request):
+    try:
+        order = Order.objects.get(user=request.user, ordered=False)
+        order.coupon = get_coupon(request, code)
+
+        order.save()
+
+        messages.success(request, "Cupón agregado exitósamente")
+        return redirect("core:checkout")
+    except ObjectDoesNotExist as e:
+        messages.info(request, "Tu no tienes una orden activa.")
+        return redirect("core:checkout")
