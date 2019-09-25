@@ -62,6 +62,20 @@ class CheckoutView(View):
                 #print(form.cleaned_data)
                 #print("The form is valid.")
 
+                use_default_shipping = form.cleaned_data.get('use_default_shipping')
+                if use_default_shipping:
+                    print("Using default shipping address.")
+                    address_qs = Address.objects.filter(
+                        user=self.request.user,
+                        address_type='S',
+                        default=True
+                    )
+                    if address_qs.exists():
+                        shipping_address = address_qs[0]
+                    else:
+                        messages.info(self.request, "No default shipping address available.")
+                        return redirect("core:checkout")
+
                 street_address = form.cleaned_data.get('street_address')
                 apartment_address = form.cleaned_data.get('apartment_address')
                 country = form.cleaned_data.get('country')
