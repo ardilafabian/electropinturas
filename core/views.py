@@ -186,6 +186,12 @@ class PaymentView(View):
     def get(self, *args, **kwargs):
         return render(self.request, "payment.html")
 
+def doSearch(searchTerm, list):
+    if searchTerm.isdigit():
+        return list.filter(code__icontains=searchTerm)
+    else:
+        return list.filter(title__icontains=searchTerm)
+
 class HomeView(ListView):
     model = Item
     paginate_by = 10
@@ -195,6 +201,13 @@ class HomeView(ListView):
         context = super(HomeView,self).get_context_data(**kwargs)
         context['categories'] = CategoryChoice.objects.all()
         return context
+
+    def get_queryset(self):
+        items = Item.objects.all()
+        if 'search' in self.request.GET:
+            return doSearch(self.request.GET['search'], items)
+        else:
+            return items
 
 
 class OrderSummaryView(LoginRequiredMixin, View):
