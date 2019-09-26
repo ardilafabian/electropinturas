@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from .forms import CheckoutForm, CouponForm, RefundForm
-from .models import Item, OrderItem, Order, Address, Coupon, Refund
+from .models import Item, OrderItem, Order, Address, Coupon, Refund, CategoryChoice
 
 import random
 import string
@@ -190,6 +190,12 @@ class HomeView(ListView):
     model = Item
     paginate_by = 10
     template_name = "home.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(HomeView,self).get_context_data(**kwargs)
+        context['categories'] = CategoryChoice.objects.all()
+        return context
+
 
 class OrderSummaryView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
