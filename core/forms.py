@@ -10,14 +10,14 @@ PAYMENT_CHOICES = (
 class CheckoutForm(forms.Form):
     shipping_address = forms.CharField(required=False)
     shipping_address2 = forms.CharField(required=False)
-    shipping_country = CountryField(blank_label='(select country)').formfield(required=False, widget=CountrySelectWidget(attrs={
+    shipping_country = CountryField(blank_label='(Selecciona el país)').formfield(required=False, widget=CountrySelectWidget(attrs={
         'class':'custom-select d-block w-100'
     }))
     shipping_zip = forms.CharField(required=False)
 
     billing_address = forms.CharField(required=False)
     billing_address2 = forms.CharField(required=False)
-    billing_country = CountryField(blank_label='(select country)').formfield(required=False, widget=CountrySelectWidget(attrs={
+    billing_country = CountryField(blank_label='(Selecciona el país)').formfield(required=False, widget=CountrySelectWidget(attrs={
         'class':'custom-select d-block w-100'
     }))
     billing_zip = forms.CharField(required=False)
