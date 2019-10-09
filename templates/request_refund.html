@@ -5,12 +5,12 @@
 <main>
     <div class="container">
 
-        <h2>Request Refund</h2>
+        <h2>Solicitar Reembolso</h2>
 
         <form method="POST">
             {% csrf_token %}
             {{ form|crispy }}
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Enviar</button>
         </form>
 
     </div>
