@@ -18,7 +18,7 @@
 
         <div class="col-6 offset-3">
 
-          <h1>{% trans "Sign In" %}</h1>
+          <h1>{% trans "Iniciar Sesión" %}</h1>
 
           {% get_providers as socialaccount_providers %}
 
@@ -40,8 +40,8 @@
             {% include "socialaccount/snippets/login_extra.html" %}
 
             {% else %}
-            <p>{% blocktrans %}If you have not created an account yet, then please
-              <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Si no has creado una cuenta aún, entonces por favor
+              <a href="{{ signup_url }}">regístrate</a> primero.{% endblocktrans %}</p>
               {% endif %}
 
               <form class="login" method="POST" action="{% url 'account_login' %}">
@@ -50,8 +50,8 @@
                 {% if redirect_field_value %}
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                 {% endif %}
-                <a class="btn btn-default " href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-                <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+                <a class="btn btn-default " href="{% url 'account_reset_password' %}">{% trans "¿Olvidaste la contraseña?" %}</a>
+                <button class="btn btn-primary" type="submit">{% trans "Inicia sesión" %}</button>
               </form>
             </div>
           </div>
