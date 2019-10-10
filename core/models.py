@@ -14,7 +14,7 @@ ADDRESS_CHOICES = (
     ('S', 'Shipping'),
 )
 
-class CategoryChoice(models.Model):
+class Category(models.Model):
     title = models.CharField(max_length=100)
     code = models.CharField(max_length=20)
     description = models.CharField(max_length=500)
@@ -22,20 +22,41 @@ class CategoryChoice(models.Model):
     def __str__(self):
         return self.title
 
-class Item(models.Model):
+class Unit(models.Model):
+    code = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+class StockItem(models.Model):
     code = models.CharField(max_length=20, default='0000')
     title = models.CharField(max_length=100)
+    quantity = models.FloatField(default=0.0)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    color = models.CharField(max_length=50, null=True)
+    description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    brand = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+class Item(models.Model):
+    code = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    stock_item = models.ForeignKey(StockItem, on_delete=models.CASCADE, null=True)
+    stock_value = models.FloatField(default=0.0)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    #TO-DO: Erase the nullable feature at the end
-    category = models.ForeignKey(CategoryChoice, on_delete=models.CASCADE, null=True)
+    purchase_price = models.FloatField()
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
     image = models.ImageField()
 
     def __str__(self):
-        return self.title
+        return self.stock_item.title
 
     def get_absolute_url(self):
         return reverse("core:product", kwargs={
