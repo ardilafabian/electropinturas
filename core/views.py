@@ -110,7 +110,7 @@ class CheckoutView(View):
                             shipping_address.default = True
                             shipping_address.save()
                     else:
-                        message.info(self.request, "Por favor completa los campos obligatorios de la dirección de entrega.")
+                        messages.info(self.request, "Por favor completa los campos obligatorios de la dirección de entrega.")
 
                 use_default_billing = form.cleaned_data.get('use_default_billing')
 
@@ -166,15 +166,15 @@ class CheckoutView(View):
                             billing_address.default = True
                             billing_address.save()
                     else:
-                        message.info(self.request, "Por favor completa los campos obligatorios de la dirección de cobro.")
+                        messages.info(self.request, "Por favor completa los campos obligatorios de la dirección de cobro.")
 
                 payment_option = form.cleaned_data.get('payment_option')
 
                 # TODO: Add redirect to cash payment
-                if payment_option == 'S':
-                    return redirect("core:payment", payment_option='stripe')
-                elif payment_option == 'P':
-                    return redirect("core:payment", payment_option='paypal')
+                if payment_option == 'C':
+                    return redirect("core:payment", payment_option='cash')
+                elif payment_option == 'BQR':
+                    return redirect("core:payment", payment_option='bancolombia-qr-code')
                 else:
                     messages.warning(self.request, "Invalid payment option selected.")
                     return redirect("core:checkout")
@@ -184,7 +184,19 @@ class CheckoutView(View):
 
 class PaymentView(View):
     def get(self, *args, **kwargs):
-        return render(self.request, "payment.html")
+        print(str(self.request)[28:-3])
+
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        if order.billing_address:
+            context = {
+                'order': order,
+                'DISPLAY_COUPON_FORM': False
+            }
+            return render(self.request, "payment.html", context)
+        else:
+            messages.warning(
+                self.request, "You have not added a billing address")
+            return redirect("core:checkout")
 
 def doSearch(searchTerm, list):
     if searchTerm.isdigit():
