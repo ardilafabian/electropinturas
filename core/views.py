@@ -170,10 +170,16 @@ class CheckoutView(View):
 
                 payment_option = form.cleaned_data.get('payment_option')
 
-                # TODO: Add redirect to cash payment
+                order.ref_code = create_ref_code()
+                order.save()
+
                 if payment_option == 'C':
+                    order.payment = 'Cash'
+                    order.save()
                     return redirect("core:payment", payment_option='cash')
                 elif payment_option == 'BQR':
+                    order.payment = 'Bancolombia código QR'
+                    order.save()
                     return redirect("core:payment", payment_option='bancolombia-qr-code')
                 else:
                     messages.warning(self.request, "Invalid payment option selected.")
@@ -197,6 +203,9 @@ class PaymentView(View):
             messages.warning(
                 self.request, "You have not added a billing address")
             return redirect("core:checkout")
+
+#def finish_order():
+
 
 def doSearch(searchTerm, list):
     if searchTerm.isdigit():
