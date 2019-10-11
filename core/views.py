@@ -204,8 +204,19 @@ class PaymentView(View):
                 self.request, "You have not added a billing address")
             return redirect("core:checkout")
 
-#def finish_order():
+def finish_order(request, ref_code):
+    order = get_object_or_404(Order, ref_code=ref_code)
 
+    order_items = order.items.all()
+    order_items.update(ordered=True)
+    for item in order_items:
+        item.save()
+
+    order.ordered = True
+
+    order.save()
+
+    return redirect("core:home")
 
 def doSearch(searchTerm, list):
     if searchTerm.isdigit():
