@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
 
@@ -12,6 +13,11 @@
 
         <!--Grid row-->
         <div class="row">
+
+            <!--Grid column-->
+            <div class="col-md-12 mb-4">
+                {% include "order_snippet.html" %}
+            </div>
 
             <!--Grid column-->
             <div class="col-md-12 mb-4">
@@ -28,14 +34,23 @@
                             <h1>${{ order.get_total }}</h1>
                         </div>
                     </div>
+
+                    {% if payment_option == 'cash' %}
+                        <div class="mb-3 text-center">
+                            <i>Para pagar en efectivo por favor acerquese a la caja.</i>
+                        </div>
+                    {% elif payment_option == 'bancolombia-qr-code' %}
+                        <i class="text-center mb-3">Abre la aplicación y escanea el código para realizar el pago.</i>
+                        <div class="text-center mb-3">
+                            <img src="{% static 'img/bancolombia-qr-code.png' %}" width="500" height="500">
+                        </div>
+                    {% endif %}
+
                 </div>
                 <!--/.Card-->
 
             </div>
-            <!--Grid column-->
-            <div class="col-md-12 mb-4">
-                {% include "order_snippet.html" %}
-            </div>
+
 
         </div>
         <!--Grid row-->

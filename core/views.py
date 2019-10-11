@@ -184,11 +184,11 @@ class CheckoutView(View):
 
 class PaymentView(View):
     def get(self, *args, **kwargs):
-        print(str(self.request)[28:-3])
 
         order = Order.objects.get(user=self.request.user, ordered=False)
         if order.billing_address:
             context = {
+                'payment_option': str(self.request)[28:-3],
                 'order': order,
                 'DISPLAY_COUPON_FORM': False
             }
